@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f1f35">
+    <title>VB Built — FieldSheet</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icons/icon-192.png">
+
+    <!-- External Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <!-- Top Chrome -->
+    <div id="top-chrome" class="top-chrome">
+        <!-- Update Banner -->
+        <div id="update-banner" class="sys-banner sys-banner--amber" style="display: none;">
+            A new version is available. <span onclick="refreshApp()" style="text-decoration:underline;cursor:pointer;">Update now</span>
+        </div>
+        
+        <!-- Reminder Banner -->
+        <div id="reminder-banner" class="sys-banner sys-banner--navy" style="display: none;">
+            Don't forget to submit your fortnightly timesheet!
+        </div>
+
+        <div class="app-header">
+            <div class="brand">
+                <img src="icons/icon-192.png" alt="VB Built" class="logo">
+                <div>
+                    <h1>VB Built</h1>
+                    <p id="greeting-text">Good afternoon, Field Team</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button onclick="saveProgress()" class="btn btn--icon">💾</button>
+                <button onclick="openSettings()" class="btn btn--icon">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Fortnight Strip -->
+        <div id="fortnight-strip" class="fortnight-strip" style="display: none;">
+            <span id="fortnight-badge" class="fortnight-badge"></span>
+        </div>
+
+        <!-- Step Navigation -->
+        <div class="step-nav">
+            <div class="step" data-tab="tab-timesheet" onclick="switchTab(this)">
+                <div class="step-dot">1</div>
+                <div class="step-label">Timesheet</div>
+            </div>
+            <div class="step-line"></div>
+            
+            <div class="step" data-tab="tab-expenses" onclick="switchTab(this)">
+                <div class="step-dot">2</div>
+                <div class="step-label">Expenses</div>
+            </div>
+            <div class="step-line"></div>
+            
+            <div class="step" data-tab="tab-mileage" onclick="switchTab(this)">
+                <div class="step-dot">3</div>
+                <div class="step-label">Mileage</div>
+            </div>
+            <div class="step-line"></div>
+            
+            <div class="step" data-tab="tab-allowances" onclick="switchTab(this)">
+                <div class="step-dot">4</div>
+                <div class="step-label">Extras</div>
+            </div>
+            <div class="step-line"></div>
+            
+            <div class="step" data-tab="tab-review" onclick="switchTab(this)">
+                <div class="step-dot">5</div>
+                <div class="step-label">Submit</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Content -->
+    <main id="app-content" class="app-content">
+
+        <!-- TAB 1: TIMESHEET -->
+        <div id="tab-timesheet" class="tab-panel active">
+            <div class="card">
+                <h2>Employee Details</h2>
+                <input type="text" id="employee-name" placeholder="Your full name" class="input">
+                <div class="form-row">
+                    <div>
+                        <label>Fortnight Start</label>
+                        <input type="date" id="fortnight-start" onchange="onFortnightStartChange(this)">
+                    </div>
+                    <div>
+                        <label>Fortnight End</label>
+                        <input type="text" id="fortnight-to-display" readonly class="input">
+                    </div>
+                </div>
+            </div>
+
+            <button id="load-last-btn" class="btn btn--secondary" style="display: none;" onclick="loadLastSubmission()">
+                Load Last Submission
+            </button>
+
+            <div id="daily-table-card" class="card" style="display: none;">
+                <h2>Daily Hours</h2>
+                
+                <!-- Quick Fill Toolbar -->
+                <div class="quick-fill">
+                    <input type="number" id="copy-hours-val" placeholder="Hours" step="0.25" style="width:80px;">
+                    <select id="copy-cat-val">
+                        <option value="work">Work</option>
+                        <option value="annual">Annual Leave</option>
+                        <option value="sick">Sick Leave</option>
+                        <option value="ph">Public Holiday</option>
+                        <option value="rdo">RDO</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button onclick="copyToAllWeekdays()" class="btn">Apply Hours</button>
+                    
+                    <input type="text" id="copy-job-val" placeholder="Job Ref" style="width:120px;">
+                    <button onclick="copyJobToAll()" class="btn">Apply Job</button>
+                </div>
+
+                <div id="daily-rows-container"></div>
+                <div id="hours-summary" class="summary"></div>
+            </div>
+
+            <div class="nav-row">
+                <button onclick="switchTabByName('tab-expenses')" class="btn btn--primary">Next: Expenses →</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: EXPENSES -->
+        <div id="tab-expenses" class="tab-panel">
+            <div class="card">
+                <h2>Expenses</h2>
+                <div id="expense-list"></div>
+
+                <div class="add-form">
+                    <select id="exp-type">
+                        <option value="">Expense Type</option>
+                        <option value="meals">Meals</option>
+                        <option value="accommodation">Accommodation</option>
+                        <option value="tools">Tools/Equipment</option>
+                        <option value="fuel">Fuel</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <input type="number" id="exp-amount" placeholder="Amount $" step="0.01">
+                    <input type="date" id="exp-date">
+                    <input type="text" id="exp-desc" placeholder="Description">
+                    
+                    <label id="receipt-label" for="exp-receipt" class="file-label">
+                        📎 <span id="receipt-upload-text">Attach Receipt</span>
+                    </label>
+                    <input type="file" id="exp-receipt" accept="image/*,application/pdf" capture="environment" onchange="onReceiptSelected(this)" hidden>
+                    <span id="receipt-size-hint" class="hint"></span>
+
+                    <button onclick="addExpense()" class="btn btn--primary">Add Expense</button>
+                </div>
+            </div>
+
+            <div class="nav-row">
+                <button onclick="switchTabByName('tab-timesheet')" class="btn">← Back</button>
+                <button onclick="switchTabByName('tab-mileage')" class="btn btn--primary">Next: Mileage →</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: MILEAGE -->
+        <div id="tab-mileage" class="tab-panel">
+            <div class="card">
+                <h2>Mileage Claims</h2>
+                <div id="mileage-list"></div>
+
+                <div class="add-form">
+                    <input type="date" id="mil-date">
+                    <input type="number" id="mil-rate" value="0.88" step="0.01" oninput="calcMileageTotal()">
+                    <input type="text" id="mil-from" placeholder="From">
+                    <input type="text" id="mil-to" placeholder="To">
+                    <input type="number" id="mil-km" placeholder="Kilometres" oninput="calcMileageTotal()">
+                    <div id="mil-total" class="calc-display">Total: $0.00</div>
+                    <button onclick="addMileage()" class="btn btn--primary">Add Mileage</button>
+                </div>
+            </div>
+
+            <div class="nav-row">
+                <button onclick="switchTabByName('tab-expenses')" class="btn">← Back</button>
+                <button onclick="switchTabByName('tab-allowances')" class="btn btn--primary">Next: Extras →</button>
+            </div>
+        </div>
+
+        <!-- TAB 4: ALLOWANCES / EXTRAS -->
+        <div id="tab-allowances" class="tab-panel">
+            <div class="card">
+                <h2>Allowances &amp; Extras</h2>
+                <div id="allowance-list"></div>
+
+                <div class="add-form">
+                    <select id="all-type">
+                        <option value="">Type</option>
+                        <option value="site">Site Allowance</option>
+                        <option value="travel">Travel Allowance</option>
+                        <option value="meal">Meal Allowance</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <input type="number" id="all-amount" placeholder="Amount $" step="0.01">
+                    <input type="text" id="all-notes" placeholder="Notes">
+                    <button onclick="addAllowance()" class="btn btn--primary">Add Item</button>
+                </div>
+            </div>
+
+            <div class="nav-row">
+                <button onclick="switchTabByName('tab-mileage')" class="btn">← Back</button>
+                <button onclick="buildReview(); gotoStep('tab-review')" class="btn btn--primary">Review &amp; Submit</button>
+            </div>
+        </div>
+
+        <!-- TAB 5: REVIEW & SUBMIT -->
+        <div id="tab-review" class="tab-panel">
+            <div id="review-content" class="card">
+                <!-- Dynamically filled by buildReview() -->
+            </div>
+
+            <div class="card">
+                <h2>Submission Method</h2>
+                
+                <!-- EmailJS Method -->
+                <div id="emailjs-method" class="submission-method" style="display: none;">
+                    <p id="emailjs-to-display"></p>
+                </div>
+
+                <!-- Manual Mailto Method -->
+                <div id="mailto-method" class="submission-method">
+                    <label>Email To:</label>
+                    <input type="email" id="email-to" placeholder="manager@company.com">
+                    <label>CC:</label>
+                    <input type="email" id="email-cc" placeholder="accounts@company.com">
+                </div>
+
+                <textarea id="submit-note-emailjs" placeholder="Additional notes..." rows="3" style="display: none;"></textarea>
+                <textarea id="submit-note-manual" placeholder="Additional notes..." rows="3"></textarea>
+
+                <button onclick="submitForm()" class="btn btn--submit">Submit Fortnightly Claim</button>
+            </div>
+
+            <div class="nav-row">
+                <button onclick="switchTabByName('tab-allowances')" class="btn">← Back</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Settings Drawer -->
+    <div id="settings-overlay" class="overlay" onclick="closeSettings()" style="display: none;">
+        <div id="settings-drawer" class="drawer" onclick="event.stopImmediatePropagation()">
+            <h2>Settings</h2>
+            <input type="text" id="settings-name" placeholder="Your Name">
+            <input type="email" id="settings-email-to" placeholder="Default Email To">
+            <input type="email" id="settings-email-cc" placeholder="Default CC">
+            
+            <h3>EmailJS Configuration</h3>
+            <input type="text" id="settings-ejs-key" placeholder="EmailJS Public Key">
+            <input type="text" id="settings-ejs-service" placeholder="Service ID">
+            <input type="text" id="settings-ejs-template" placeholder="Template ID">
+            <div id="emailjs-status" class="status"></div>
+
+            <label>
+                <input type="checkbox" id="settings-reminders">
+                Enable submission reminders
+            </label>
+
+            <div class="drawer-actions">
+                <button onclick="saveSettings()" class="btn">Save Settings</button>
+                <button onclick="closeSettings()" class="btn btn--secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div id="success-overlay" class="success-overlay hidden">
+        <div class="success-content">
+            <div class="success-emoji">✅</div>
+            <h2>Submitted!</h2>
+            <p id="success-msg">Your timesheet and expenses have been submitted successfully.</p>
+            <p id="success-next-info"></p>
+            <p id="pdf-filename-display" class="filename"></p>
+            <button onclick="dismissSuccess()" class="btn">Done</button>
+            <button onclick="startNewSubmission()" class="btn btn--secondary">Start Next Fortnight</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p id="loading-text">Processing...</p>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
