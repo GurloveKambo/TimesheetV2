@@ -1,267 +1,62 @@
 <!DOCTYPE html>
 <html lang="en-AU">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>VB Built — FieldSheet</title>
-
-  <!-- PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#0f1f35" />
-  <link rel="manifest" href="manifest.json" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- External libs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VB Built FieldSheet</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- ================= TOP CHROME ================= -->
-<div class="top-chrome" id="top-chrome">
+<header class="header">
+  <h1>VB Built</h1>
+</header>
 
-  <div id="update-banner" class="sys-banner sys-banner--amber hidden">
-    New version available
-    <button onclick="applyUpdate()">Update</button>
-  </div>
+<nav class="tabs">
+  <button onclick="gotoTab('timesheet')" class="active">Timesheet</button>
+  <button onclick="gotoTab('expenses')">Expenses</button>
+  <button onclick="gotoTab('mileage')">Mileage</button>
+  <button onclick="gotoTab('allowances')">Extras</button>
+  <button onclick="gotoTab('review')">Review</button>
+</nav>
 
-  <div id="reminder-banner" class="sys-banner sys-banner--navy hidden"></div>
+<main>
 
-  <div class="app-header">
-    <img src="icons/icon-192.png" class="brand-logo" />
-    <div>
-      <div class="brand-name">VB Built</div>
-      <div class="brand-sub" id="greeting-text">Timesheet Portal</div>
-    </div>
-    <button class="icon-btn" onclick="saveProgress()">💾</button>
-    <button class="icon-btn" onclick="openSettings()">⚙️</button>
-  </div>
+<section id="timesheet" class="tab active">
+  <input type="date" id="startDate" onchange="buildDays()">
+  <div id="days"></div>
+</section>
 
-  <div id="fortnight-strip" class="fortnight-strip hidden">
-    <span id="fortnight-badge"></span>
-  </div>
+<section id="expenses" class="tab">
+  <input id="expAmount" placeholder="Amount">
+  <input id="expDesc" placeholder="Description">
+  <button onclick="addExpense()">Add</button>
+  <div id="expList"></div>
+</section>
 
-  <!-- Step Nav -->
-  <div class="step-nav">
-    <button class="step-btn active" data-tab="tab-timesheet" onclick="switchTab(this)">
-      <div class="step-dot">1</div>
-      <div class="step-label">Timesheet</div>
-    </button>
-    <div class="step-line"></div>
+<section id="mileage" class="tab">
+  <input id="km" placeholder="KM">
+  <button onclick="addMileage()">Add</button>
+  <div id="milList"></div>
+</section>
 
-    <button class="step-btn" data-tab="tab-expenses" onclick="switchTab(this)">
-      <div class="step-dot">2</div>
-      <div class="step-label">Expenses</div>
-    </button>
-    <div class="step-line"></div>
+<section id="allowances" class="tab">
+  <input id="allowAmt" placeholder="Amount">
+  <button onclick="addAllowance()">Add</button>
+  <div id="allowList"></div>
+</section>
 
-    <button class="step-btn" data-tab="tab-mileage" onclick="switchTab(this)">
-      <div class="step-dot">3</div>
-      <div class="step-label">Mileage</div>
-    </button>
-    <div class="step-line"></div>
-
-    <button class="step-btn" data-tab="tab-allowances" onclick="switchTab(this)">
-      <div class="step-dot">4</div>
-      <div class="step-label">Extras</div>
-    </button>
-    <div class="step-line"></div>
-
-    <button class="step-btn" data-tab="tab-review" onclick="switchTab(this)">
-      <div class="step-dot">5</div>
-      <div class="step-label">Submit</div>
-    </button>
-  </div>
-</div>
-
-<!-- ================= MAIN ================= -->
-<main class="app-content" id="app-content">
-
-  <!-- ===== TAB 1 TIMESHEET ===== -->
-  <section id="tab-timesheet" class="tab-panel active">
-    <div class="card">
-      <div class="fg">
-        <label class="fl">Employee Name</label>
-        <input id="employee-name" class="fi" />
-      </div>
-
-      <div class="fg">
-        <label class="fl">Fortnight Start</label>
-        <input type="date" id="fortnight-from" class="fi"
-          onchange="onFortnightStartChange(this)" />
-      </div>
-
-      <div class="fg">
-        <label class="fl">Fortnight End</label>
-        <div id="fortnight-to-display" class="fi fi-ro"></div>
-      </div>
-
-      <button id="load-last-btn" class="btn btn--ghost hidden"
-        onclick="loadLastSubmission()">Load Last Submission</button>
-    </div>
-
-    <div id="daily-table-card" class="card hidden">
-      <div class="qf-bar">
-        <div class="qf-row">
-          <input id="copy-hours-val" class="qf-hrs" placeholder="7.6" />
-          <select id="copy-cat-val" class="qf-sel">
-            <option value="work">Work</option>
-            <option value="annual">Annual</option>
-            <option value="sick">Sick</option>
-            <option value="ph">Public Holiday</option>
-            <option value="rdo">RDO</option>
-            <option value="other">Other</option>
-          </select>
-          <button class="qf-btn" onclick="copyToAllWeekdays()">Apply</button>
-        </div>
-
-        <div class="qf-row">
-          <input id="copy-job-val" class="qf-job" placeholder="Job ref" />
-          <button class="qf-btn" onclick="copyJobToAll()">Apply</button>
-        </div>
-      </div>
-
-      <div id="daily-rows-container"></div>
-      <div id="hours-summary" class="hrs-summary"></div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn--next" onclick="gotoStep('tab-expenses')">Next</button>
-    </div>
-  </section>
-
-  <!-- ===== TAB 2 EXPENSES ===== -->
-  <section id="tab-expenses" class="tab-panel">
-    <div class="card">
-      <div id="expense-list"></div>
-
-      <div class="add-form">
-        <select id="exp-type" class="fi">
-          <option>Fuel</option>
-          <option>Materials</option>
-          <option>Tools</option>
-        </select>
-        <input id="exp-amount" type="number" class="fi" placeholder="Amount" />
-        <input id="exp-date" type="date" class="fi" />
-        <input id="exp-desc" class="fi" placeholder="Description" />
-
-        <label id="receipt-label" class="file-btn">
-          <span id="receipt-upload-text">Upload receipt</span>
-        </label>
-        <input id="exp-receipt" type="file" hidden
-          accept="image/*,application/pdf"
-          onchange="onReceiptSelected(this)" />
-
-        <span id="receipt-size-hint"></span>
-
-        <button class="btn btn--primary" onclick="addExpense()">Add Expense</button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn--ghost" onclick="gotoStep('tab-timesheet')">Back</button>
-      <button class="btn btn--next" onclick="gotoStep('tab-mileage')">Next</button>
-    </div>
-  </section>
-
-  <!-- ===== TAB 3 MILEAGE ===== -->
-  <section id="tab-mileage" class="tab-panel">
-    <div class="card">
-      <div id="mileage-list"></div>
-
-      <div class="add-form">
-        <input id="mil-date" type="date" class="fi" />
-        <input id="mil-from" class="fi" placeholder="From" />
-        <input id="mil-to" class="fi" placeholder="To" />
-        <input id="mil-km" class="fi" placeholder="KM" oninput="calcMileageTotal()" />
-        <input id="mil-rate" class="fi" value="0.88" oninput="calcMileageTotal()" />
-
-        <div id="mil-total" class="calc-chip">0.00</div>
-
-        <button class="btn btn--primary" onclick="addMileage()">Add</button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn--ghost" onclick="gotoStep('tab-expenses')">Back</button>
-      <button class="btn btn--next" onclick="gotoStep('tab-allowances')">Next</button>
-    </div>
-  </section>
-
-  <!-- ===== TAB 4 ALLOWANCES ===== -->
-  <section id="tab-allowances" class="tab-panel">
-    <div class="card">
-      <div id="allowance-list"></div>
-
-      <div class="add-form">
-        <input id="all-type" class="fi" placeholder="Type" />
-        <input id="all-amount" type="number" class="fi" />
-        <input id="all-notes" class="fi" placeholder="Notes" />
-        <button class="btn btn--primary" onclick="addAllowance()">Add</button>
-      </div>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn--ghost" onclick="gotoStep('tab-mileage')">Back</button>
-      <button class="btn btn--next" onclick="buildReview(); gotoStep('tab-review')">Review</button>
-    </div>
-  </section>
-
-  <!-- ===== TAB 5 REVIEW ===== -->
-  <section id="tab-review" class="tab-panel">
-    <div id="review-content" class="card"></div>
-
-    <div class="card">
-      <div id="mailto-method">
-        <input id="email-to" class="fi" placeholder="Send To" />
-        <input id="email-cc" class="fi" placeholder="CC" />
-      </div>
-
-      <button class="btn btn--submit" onclick="submitForm()">Submit</button>
-    </div>
-
-    <div class="nav-row">
-      <button class="btn btn--ghost" onclick="gotoStep('tab-allowances')">Back</button>
-    </div>
-  </section>
+<section id="review" class="tab">
+  <button onclick="buildReview()">Refresh</button>
+  <div id="reviewBox"></div>
+  <button onclick="submitForm()">Submit</button>
+</section>
 
 </main>
 
-<!-- SETTINGS -->
-<div id="settings-overlay" class="overlay hidden" onclick="closeSettings()"></div>
-
-<div id="settings-drawer" class="settings-drawer">
-  <div class="drawer-body">
-    <input id="settings-name" class="fi" placeholder="Name" />
-    <input id="settings-email-to" class="fi" placeholder="Email To" />
-    <input id="settings-email-cc" class="fi" placeholder="CC" />
-    <button class="btn btn--primary" onclick="saveSettings()">Save</button>
-    <button class="btn btn--ghost" onclick="closeSettings()">Cancel</button>
-  </div>
-</div>
-
-<!-- SUCCESS -->
-<div id="success-overlay" class="success-overlay hidden">
-  <div class="success-card">
-    <h2>Submitted!</h2>
-    <div id="success-msg"></div>
-    <button onclick="dismissSuccess()">Done</button>
-  </div>
-</div>
-
-<!-- LOADING -->
-<div id="loading-overlay" class="loading-overlay hidden">
-  <div class="spinner"></div>
-  <div id="loading-text">Processing...</div>
-</div>
-
-<div id="toast" class="toast hidden"></div>
+<div id="toast"></div>
 
 <script src="app.js"></script>
-
 </body>
 </html>
