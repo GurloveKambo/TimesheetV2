@@ -1,14 +1,17 @@
 {
   "name": "VB Built — FieldSheet",
   "short_name": "FieldSheet",
-  "description": "Submit fortnightly timesheets, expenses, mileage and allowances. Works offline.",
-  "start_url": "./",
+  "description": "Mobile timesheet and expense submission app for VB Built field team. Works completely offline.",
+  "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0f1f35",
   "theme_color": "#0f1f35",
   "orientation": "portrait-primary",
   "lang": "en-AU",
-  "categories": ["business", "productivity"],
+  "categories": ["business", "productivity", "utilities"],
+  "scope": "./",
+  "id": "vbbuilt-fieldsheet",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -23,8 +26,7 @@
       "purpose": "any maskable"
     }
   ],
-  "scope": "./",
-  "id": "com.vbbuilt.fieldsheet",
-  "dir": "ltr",
+  "screenshots": [],
+  "shortcuts": [],
   "prefer_related_applications": false
 }
