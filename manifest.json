@@ -1,17 +1,15 @@
 {
   "name": "VB Built — FieldSheet",
-  "short_name": "FieldSheet",
-  "description": "Mobile timesheet and expense submission app for VB Built field team. Works completely offline.",
-  "start_url": "./index.html",
+  "short_name": "VB Built",
+  "description": "Submit fortnightly timesheets and expense claims. Works offline.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+
   "background_color": "#0f1f35",
   "theme_color": "#0f1f35",
-  "orientation": "portrait-primary",
-  "lang": "en-AU",
-  "categories": ["business", "productivity", "utilities"],
-  "scope": "./",
-  "id": "vbbuilt-fieldsheet",
+
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -26,7 +24,7 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
-  "shortcuts": [],
-  "prefer_related_applications": false
+
+  "categories": ["business", "productivity"],
+  "lang": "en-AU"
 }
