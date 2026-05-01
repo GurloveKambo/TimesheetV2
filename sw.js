@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4';                    // ← Increment this to force cache update
+const CACHE_VERSION = 'v4.1';                    // ← Increment this to force cache update
 const CACHE_NAME = 'fieldsheet-' + CACHE_VERSION;
 
 const STATIC_ASSETS = [
