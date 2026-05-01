@@ -1,325 +1,70 @@
-/* ================= FONTS ================= /
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Figtree:wght@400;500;600;700&display=swap');
-
-/ ================= VARIABLES ================= /
-:root {
-  --navy: #0f1f35;
-  --navy-mid: #162842;
-  --navy-lt: #1e3a57;
-  --navy-dim: #8aadcc;
-
-  --amber: #f59e0b;
-  --amber-lt: #fcd34d;
-
-  --green: #22c55e;
-  --red: #ef4444;
-
-  --bg: #f0f3f7;
-  --card: #fff;
-  --border: #dde3ec;
-  --border-dk: #b8c6d6;
-
-  --text: #0f1f35;
-  --text2: #4a5a6e;
-  --muted: #8a9bb0;
-
-  --r: 12px;
-  --r-sm: 8px;
-
-  --ff-head: 'Syne', sans-serif;
-  --ff-body: 'Figtree', sans-serif;
-
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-}
-
-/ ================= BASE ================= /
 body {
-  margin: 0;
-  font-family: var(--ff-body);
-  background:
-    radial-gradient(circle at 1px 1px, #dbe4ef 1px, transparent 0) 0 0/22px 22px,
-    var(--bg);
-  padding-bottom: calc(20px + var(--sab));
+  margin:0;
+  font-family:system-ui;
+  background:#f4f6f9;
 }
 
-.hidden { display: none !important; }
-
-/ ================= TOP CHROME ================= /
-.top-chrome {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: var(--navy);
-  z-index: 100;
-  padding-top: var(--sat);
+.header {
+  background:#0f1f35;
+  color:white;
+  padding:16px;
+  text-align:center;
 }
 
-.app-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 14px;
-  gap: 10px;
+.tabs {
+  display:flex;
+  background:#162842;
 }
 
-.brand-logo {
-  width: 34px;
-  height: 34px;
-  border-radius: 7px;
+.tabs button {
+  flex:1;
+  padding:12px;
+  border:none;
+  background:none;
+  color:#ccc;
 }
 
-.brand-name {
-  font-family: var(--ff-head);
-  font-size: 17px;
-  color: #fff;
+.tabs button.active {
+  color:#f59e0b;
+  border-bottom:3px solid #f59e0b;
 }
 
-.brand-sub {
-  font-size: 11px;
-  color: var(--navy-dim);
+main {
+  padding:16px;
 }
 
-.icon-btn {
-  margin-left: auto;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: var(--navy-mid);
-  border: 1px solid var(--navy-lt);
-  color: #fff;
+.tab { display:none; }
+.tab.active { display:block; }
+
+input {
+  width:100%;
+  padding:10px;
+  margin:6px 0;
 }
 
-/ ================= STEP NAV ================= /
-.step-nav {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid var(--navy-lt);
+button {
+  padding:10px;
+  margin-top:6px;
+  width:100%;
 }
 
-.step-btn {
-  flex: 1;
-  text-align: center;
-  background: none;
-  border: none;
-}
-
-.step-dot {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--navy-lt);
-  color: #fff;
-  font-size: 12px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.step-btn.active .step-dot {
-  background: var(--amber);
-  color: var(--navy);
-}
-
-.step-label {
-  font-size: 9px;
-  color: var(--navy-dim);
-}
-
-.step-btn.active .step-label {
-  color: var(--amber-lt);
-}
-
-/ ================= CONTENT ================= /
-.app-content {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 14px 12px;
-  margin-top: 160px; / critical fallback /
-}
-
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/ ================= CARD ================= /
 .card {
-  background: var(--card);
-  border-radius: var(--r);
-  padding: 16px;
-  margin-bottom: 14px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  background:white;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
 }
 
-/ ================= FORM ================= /
-.fl {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.fi {
-  width: 100%;
-  min-height: 46px;
-  border-radius: var(--r-sm);
-  border: 2px solid var(--border);
-  padding: 8px;
-  margin-bottom: 10px;
-}
-
-.fi:focus {
-  outline: none;
-  border-color: var(--navy);
-}
-
-.fi-ro {
-  background: #eef2f7;
-}
-
-/ ================= DAY ROW ================= /
-.day-row {
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  margin-bottom: 8px;
-}
-
-.day-row.weekend {
-  background: #faf8ff;
-}
-
-.day-row-top {
-  background: #f5f7fa;
-  padding: 6px 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.day-row-inputs {
-  display: grid;
-  grid-template-columns: 1fr 70px 1fr;
-  gap: 6px;
-  padding: 8px;
-}
-
-.day-row input,
-.day-row select {
-  height: 40px;
-}
-
-/ ================= SUMMARY ================= /
-.hrs-summary {
-  background: var(--navy);
-  color: #fff;
-  padding: 10px;
-  border-radius: var(--r-sm);
-  margin-top: 10px;
-}
-
-/ ================= BUTTONS ================= /
-.btn {
-  min-height: 50px;
-  border-radius: var(--r-sm);
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-
-.btn--primary {
-  background: var(--navy);
-  color: #fff;
-}
-
-.btn--ghost {
-  background: #fff;
-  border: 1px solid var(--border-dk);
-}
-
-.btn--next {
-  background: var(--navy);
-  color: #fff;
-}
-
-.btn--submit {
-  background: var(--amber);
-  color: var(--navy);
-  width: 100%;
-  height: 54px;
-  font-size: 16px;
-}
-
-.nav-row {
-  display: flex;
-  gap: 10px;
-}
-
-/ ================= OVERLAYS ================= /
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-}
-
-.settings-drawer {
-  position: fixed;
-  right: 0;
-  top: 0;
-  width: min(360px, 100%);
-  height: 100%;
-  background: #fff;
-  padding: 16px;
-}
-
-/ ================= SUCCESS ================= /
-.success-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.success-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  text-align: center;
-}
-
-/ ================= LOADING ================= /
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #fff;
-  border-top: 4px solid var(--amber);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/ ================= TOAST ================= */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--navy);
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 30px;
+#toast {
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#0f1f35;
+  color:white;
+  padding:10px 16px;
+  border-radius:20px;
+  display:none;
 }
